@@ -18,18 +18,30 @@ export interface Attachment {
   url: string;
 }
 
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  isOnline?: boolean;
+}
+
 export interface Chat {
   id: string;
   name: string;
+  type: 'channel' | 'direct';
   participants: string[];
+  participantDetails?: User[];
   lastMessage?: Message;
   messages: Message[];
+  createdAt: Date;
 }
 
 interface ChatState {
   chats: Chat[];
   activeChat: string | null;
   messages: Message[];
+  users: User[];
   isLoading: boolean;
 }
 
@@ -38,6 +50,7 @@ const initialState: ChatState = {
     {
       id: '1',
       name: 'General',
+      type: 'channel',
       participants: ['user1', 'user2'],
       messages: [
         {
@@ -49,6 +62,30 @@ const initialState: ChatState = {
           type: 'text',
         },
       ],
+      createdAt: new Date(),
+    },
+  ],
+  users: [
+    {
+      id: 'user2',
+      name: 'Alice Johnson',
+      email: 'alice@example.com',
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=alice',
+      isOnline: true,
+    },
+    {
+      id: 'user3',
+      name: 'Bob Smith',
+      email: 'bob@example.com',
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=bob',
+      isOnline: false,
+    },
+    {
+      id: 'user4',
+      name: 'Carol Davis',
+      email: 'carol@example.com',
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=carol',
+      isOnline: true,
     },
   ],
   activeChat: '1',
@@ -87,8 +124,48 @@ const chatSlice = createSlice({
         state.messages.push(newMessage);
       }
     },
+    createDirectMessage: (state, action: PayloadAction<{ userId: string; userName: string; userAvatar?: string }>) => {
+      const { userId, userName, userAvatar } = action.payload;
+      const currentUserId = '1'; // This would come from auth state in real app
+      
+      // Check if DM already exists
+      const existingDM = state.chats.find(
+        chat => chat.type === 'direct' && 
+        chat.participants.includes(userId) && 
+        chat.participants.includes(currentUserId)
+      );
+      
+      if (existingDM) {
+        state.activeChat = existingDM.id;
+        state.messages = existingDM.messages;
+        return;
+      }
+      
+      // Create new DM
+      const newDM: Chat = {
+        id: `dm-${Date.now()}`,
+        name: userName,
+        type: 'direct',
+        participants: [currentUserId, userId],
+        participantDetails: [
+          {
+            id: userId,
+            name: userName,
+            email: `${userName.toLowerCase().replace(' ', '.')}@example.com`,
+            avatar: userAvatar,
+            isOnline: Math.random() > 0.5,
+          }
+        ],
+        messages: [],
+        createdAt: new Date(),
+      };
+      
+      state.chats.push(newDM);
+      state.activeChat = newDM.id;
+      state.messages = [];
+    },
   },
 });
 
-export const { setActiveChat, addMessage, sendMessage } = chatSlice.actions;
+export const { setActiveChat, addMessage, sendMessage, createDirectMessage } = chatSlice.actions;
 export default chatSlice.reducer;
