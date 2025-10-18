@@ -16,6 +16,7 @@ import { loginSuccess } from "@/store/slices/authSlice"
 import { MessageCircle } from "lucide-react"
 import { registerUser } from "@/api/index"
 import { toast } from "@/components/ui/use-toast"
+import { useSocket } from "@/context/socketContext"
 
 type FormState = { name: string; email: string; password: string }
 
@@ -25,6 +26,7 @@ export default function Signup() {
   const [form, setForm] = useState<FormState>(initialForm)
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const socket = useSocket()
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((s) => ({ ...s, [e.target.id]: e.target.value }))
@@ -59,9 +61,8 @@ export default function Signup() {
         })
         return
       }
-      dispatch(
-        loginSuccess({ ...user, id: user._id })
-      )
+      socket.emit("user:join", user._id)
+      dispatch(loginSuccess({ ...user, id: user._id }))
       navigate("/chat")
     } catch (err: unknown) {
       console.error("Signup error:", err)
