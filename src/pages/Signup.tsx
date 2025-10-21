@@ -14,9 +14,10 @@ import {
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { loginSuccess } from "@/store/slices/authSlice"
 import { MessageCircle } from "lucide-react"
-import { registerUser } from "@/api/index"
+import { registerUser } from "@/api/authApi/index"
 import { toast } from "@/components/ui/use-toast"
 import { useSocket } from "@/context/socketContext"
+import api from "@/api"
 
 type FormState = { name: string; email: string; password: string }
 
@@ -46,13 +47,13 @@ export default function Signup() {
     try {
       const { name, email, password } = form
       const profilePicUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`
-      const res = await registerUser({
+      const res = await api.post("/auth/register", {
         name,
         email,
         password,
         profilePicUrl,
       })
-      const user = res?.data?.user
+      const { token, user } = res.data
       if (!user) {
         console.error("registerUser: unexpected response", res)
         toast({
@@ -61,9 +62,8 @@ export default function Signup() {
         })
         return
       }
-      socket.emit("user:join", user._id)
-      dispatch(loginSuccess({ ...user, id: user._id }))
-      navigate("/chat")
+      dispatch(loginSuccess({ user: { ...user, id: user._id }, token }))
+      sessionStorage.setItem("email", user.email)
     } catch (err: unknown) {
       console.error("Signup error:", err)
       toast({

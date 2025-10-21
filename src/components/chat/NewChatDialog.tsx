@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Plus, Search } from "lucide-react"
-import { getAllUsers } from "@/api/userApi"
+import { getAllUsers, getUserDetailsById } from "@/api/userApi"
 import axios from "axios"
 import { getDirectMessageByChatIds } from "@/api/chatApi"
 
@@ -51,12 +51,16 @@ export const NewChatDialog = () => {
     })
 
     const chatId = res?.data?._id || `dm-${Date.now()}`
+    const chatMembers = res?.data?.members || []
+    const otherMembers = chatMembers.filter((m) => m !== currentUser.id)
+    const userRes = await getUserDetailsById(otherMembers[0])
+
     dispatch(
       createDirectMessage({
         chatId,
         createdAt: res?.data?.createdAt,
         currentUserId: currentUser?.id as string,
-        isUserOnline: res.data.status === "online",
+        isUserOnline: userRes.data.status === "online",
         userId: user.id,
         userEmail: user.email,
         userName: user.name,
@@ -75,7 +79,6 @@ export const NewChatDialog = () => {
         const res = await getAllUsers()
         const allUsers = res?.data?.users || []
         const result: User[] = allUsers.map((u) => ({ ...u, id: u._id }))
-
         dispatch(setListOfUsers({ users: result }))
       } catch (err) {
         if (axios.isCancel(err)) {

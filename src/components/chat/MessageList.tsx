@@ -14,8 +14,8 @@ export const MessageList = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const dispatch = useDispatch()
 
-  useChatSocket(activeChatId, user.id, (message: Message) => {
-    if (message?.senderId !== user.id) {
+  useChatSocket(activeChatId, user?.id, (message: Message) => {
+    if (message?.senderId !== user?.id) {
       dispatch(
         setMessage({
           messages: [...messages, message],

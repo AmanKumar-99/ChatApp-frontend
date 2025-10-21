@@ -1,15 +1,19 @@
-import { useSelector } from "react-redux"
-import { Navigate } from "react-router-dom"
-import { RootState } from "@/store/store"
 import { ChatSidebar } from "@/components/chat/ChatSidebar"
 import { ChatWindow } from "@/components/chat/ChatWindow"
+import { useSocket } from "@/context/socketContext"
+import type { RootState } from "@/store/store"
+import { useEffect } from "react"
+import { useSelector } from "react-redux"
 
 const Chat = () => {
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth)
+  const { user } = useSelector((state: RootState) => state.auth)
+  const socket = useSocket()
 
-  if (!isAuthenticated) {
-    return <Navigate to='/login' replace />
-  }
+  useEffect(() => {
+    if (user) {
+      socket.emit("user:join", user?.id)
+    }
+  }, [socket, user])
 
   return (
     <div className='h-screen flex bg-chat-background'>

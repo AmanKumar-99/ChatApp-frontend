@@ -39,10 +39,10 @@ export interface Chat {
 }
 
 interface ChatState {
-  chats: Chat[]
+  chats: Chat[] // Overall chats
   activeChatId: string | null
-  messages: Message[]
-  users: User[]
+  messages: Message[] // Overall messages
+  users: User[] // Overall users
   isLoading: boolean
 }
 

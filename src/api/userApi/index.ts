@@ -7,7 +7,7 @@ export const getAllUsers = async () => {
   })
 }
 
-export const getUserById = async (userId: string) => {
+export const getUserDetailsById = async (userId: string) => {
   return await axios.get(`${BASE_URL}/users/${userId}`, {
     withCredentials: true,
   })

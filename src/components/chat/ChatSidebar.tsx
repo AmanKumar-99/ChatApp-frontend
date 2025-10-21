@@ -13,9 +13,15 @@ import {
 } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { MessageCircle, LogOut, Hash } from "lucide-react"
+import { useCallback } from "react"
+import api from "@/api"
+import { useNavigate } from "react-router-dom"
+import { useSocket } from "@/context/socketContext"
 
 export const ChatSidebar = () => {
+  const socket = useSocket()
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const { user } = useSelector((state: RootState) => state.auth)
   const { chats, activeChatId } = useSelector(
     (state: RootState) => state.chat
@@ -23,7 +29,18 @@ export const ChatSidebar = () => {
 
   const avatarSrc = user ? user.profilePicUrl ?? undefined : undefined
 
-  const handleLogout = () => dispatch(logout())
+  const handleLogout = useCallback(async () => {
+    const res = await api.post("/auth/logout")
+
+    if (res.data.ok) {
+      // On successful logout
+      dispatch(logout())
+      socket.emit("disconnected")
+      socket.disconnect()
+      sessionStorage.clear()
+      navigate("/login")
+    }
+  }, [dispatch, navigate, socket])
 
   return (
     <div className='w-64 bg-chat-sidebar border-r flex flex-col'>

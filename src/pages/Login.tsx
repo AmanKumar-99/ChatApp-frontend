@@ -14,9 +14,9 @@ import {
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { loginSuccess } from "@/store/slices/authSlice"
 import { MessageCircle } from "lucide-react"
-import { loginUser } from "@/api/index"
 import { toast } from "@/components/ui/use-toast"
 import { useSocket } from "@/context/socketContext"
+import api from "@/api"
 
 type FormState = { email: string; password: string }
 
@@ -26,7 +26,6 @@ export default function Login() {
   const [form, setForm] = useState<FormState>(initialForm)
   const socket = useSocket()
   const dispatch = useDispatch()
-  const navigate = useNavigate()
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((s) => ({ ...s, [e.target.id]: e.target.value }))
@@ -45,17 +44,16 @@ export default function Login() {
     ev.preventDefault()
     try {
       const { email, password } = form
-      const res = await loginUser({ email, password })
-      const user = res?.data?.user
+      const res = await api.post("/auth/signin", { email, password })
+      const { token, user } = res.data
       if (user) {
         dispatch(
           loginSuccess({
-            ...user,
-            id: user._id,
+            user: { ...user, id: user._id },
+            token,
           })
         )
-        socket.emit("user:join", user._id)
-        navigate("/chat")
+        sessionStorage.setItem("email", user.email)
       }
     } catch (err: unknown) {
       console.error("Login error:", err)

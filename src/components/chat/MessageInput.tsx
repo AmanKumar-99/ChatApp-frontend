@@ -36,7 +36,7 @@ export const MessageInput = () => {
 
     socket.emit("chat:message", {
       chatId: activeChatId,
-      senderId: user.id,
+      senderId: user?.id,
       content: message,
       mediaUrl: attachments[attachments.length - 1]?.url,
     })
@@ -56,7 +56,7 @@ export const MessageInput = () => {
     setAttachments([])
   }
 
-  useChatSocket(activeChatId, user.id, (_) => {
+  useChatSocket(activeChatId, user?.id, (_) => {
     const button = buttonRef.current
 
     if (button) {
