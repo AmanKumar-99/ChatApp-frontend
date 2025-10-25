@@ -54,6 +54,7 @@ export default function Login() {
           })
         )
         sessionStorage.setItem("email", user.email)
+        window.location.reload() // This is to ensure that the socket connection is re-established with the logged-in user context
       }
     } catch (err: unknown) {
       console.error("Login error:", err)

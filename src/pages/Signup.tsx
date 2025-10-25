@@ -64,6 +64,7 @@ export default function Signup() {
       }
       dispatch(loginSuccess({ user: { ...user, id: user._id }, token }))
       sessionStorage.setItem("email", user.email)
+      window.location.reload() // This is to ensure that the socket connection is re-established with the logged-in user context
     } catch (err: unknown) {
       console.error("Signup error:", err)
       toast({
