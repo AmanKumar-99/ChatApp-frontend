@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import { useDispatch } from "react-redux"
-import { Link, useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -15,7 +15,6 @@ import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { loginSuccess } from "@/store/slices/authSlice"
 import { MessageCircle } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
-import { useSocket } from "@/context/socketContext"
 import api from "@/api"
 
 type FormState = { email: string; password: string }
@@ -24,7 +23,6 @@ const initialForm: FormState = { email: "", password: "" }
 
 export default function Login() {
   const [form, setForm] = useState<FormState>(initialForm)
-  const socket = useSocket()
   const dispatch = useDispatch()
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) =>
