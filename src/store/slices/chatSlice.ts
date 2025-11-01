@@ -77,11 +77,10 @@ const chatSlice = createSlice({
     },
     sendMessage: (
       state,
-      action: PayloadAction<Omit<Message, "id" | "createdAt">>
+      action: PayloadAction<Omit<Message, "createdAt">>
     ) => {
       const newMessage: Message = {
         ...action.payload,
-        id: Date.now().toString(),
         createdAt: new Date().toISOString(),
       }
 

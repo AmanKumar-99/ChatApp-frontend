@@ -1,11 +1,9 @@
-import { useState, useRef, useCallback } from "react"
+import { useState, useRef } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { RootState } from "@/store/store"
 import {
   sendMessage,
   Attachment,
-  setMessage,
-  type Message,
 } from "@/store/slices/chatSlice"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -39,18 +37,25 @@ export const MessageInput = () => {
       senderId: user?.id,
       content: message,
       mediaUrl: attachments[attachments.length - 1]?.url,
+      fileData: attachments[attachments.length - 1]?.url,
+      originalFileName: attachments[attachments.length - 1]?.name,
+      fileType: attachments.length > 0 ? "file" : "text",
+      fileName: attachments[attachments.length - 1]?.name,
     })
 
-    dispatch(
-      sendMessage({
-        chatId: activeChatId,
-        content: message,
-        senderId: user?.id || "1",
-        senderName: user?.name || "You",
-        attachments: attachments.length > 0 ? attachments : undefined,
-        type: attachments.length > 0 ? "file" : "text",
-      })
-    )
+    socket.on("chat:messageSent",(messageId: string)=>{
+      dispatch(
+        sendMessage({
+          id: messageId,
+          chatId: activeChatId,
+          content: message,
+          senderId: user?.id || "1",
+          senderName: user?.name || "You",
+          attachments: attachments.length > 0 ? attachments : undefined,
+          type: attachments.length > 0 ? "file" : "text",
+        })
+      )
+    })
 
     setMessage("")
     setAttachments([])
