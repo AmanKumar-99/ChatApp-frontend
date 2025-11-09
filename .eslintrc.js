@@ -42,7 +42,6 @@ module.exports = {
   rules: {
     // your preferred rules; sensible defaults follow
     "prettier/prettier": "error",
-    "react/react-in-jsx-scope": "off", // not needed with modern React
     "react/prop-types": "off", // using TypeScript for props validation
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/no-explicit-any": "warn",
